@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CareerPilot AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+w
+
+<style>
+:root{
+  --green:#0f6b57; --green-d:#0a5242; --mint:#e6f4ef; --bg:#f3f8f6; --card:#fff;
+  --ink:#16302b; --muted:#6b7f79; --line:#e3ece8; --teal:#19b394; --amber:#f5a524;
+  --red:#e5484d; --blue:#4c7cf0; --purple:#8b6cf0; --orange:#f08a3c;
+  --r:14px; --shadow:0 4px 18px rgba(15,107,87,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.view{display:none}.view.active{display:block}
+
+/* view switcher */
+.switch{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:4px;background:#fff;padding:4px;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,.15)}
+.switch button{padding:8px 16px;border-radius:999px;background:none;color:var(--muted);font-weight:600;font-size:13px}
+.switch button.on{background:var(--green);color:#fff}
+
+/* shared */
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--green);color:#fff;display:grid;place-items:center;font-style:normal}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;font-weight:700;font-size:14px;transition:background .2s}
+.btn.primary{background:var(--green);color:#fff}.btn.primary:hover{background:var(--green-d)}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--line)}
+.chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--mint);color:var(--green)}
+.chip.warn{background:#fff3dc;color:#b76e00}.chip.bad{background:#ffe5e5;color:var(--red)}
+
+/* landing */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 6vw;background:#fff;border-bottom:1px solid var(--line)}
+.nav nav{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--muted)}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:56px 6vw 36px;background:radial-gradient(circle at 80% 30%,#d9f1ea 0,transparent 55%),#fff}
+.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero p{margin:18px 0 28px;color:var(--muted);max-width:46ch}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.art{position:relative;height:340px;border-radius:28px;background:linear-gradient(135deg,#e6f4ef,#fdf3df);display:grid;place-items:center;overflow:hidden}
+.art .person{font-size:130px}
+.art span.tag{position:absolute;background:#fff;padding:6px 14px;border-radius:99px;font-weight:700;font-size:13px;box-shadow:var(--shadow)}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:0 6vw;margin-top:-10px;position:relative}
+.feat{padding:18px;display:flex;gap:12px;align-items:flex-start}
+.feat b{display:block;font-size:14px}.feat small{color:var(--muted);font-size:12px}
+.ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;flex:none;background:var(--mint)}
+.why{margin:28px 6vw 60px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;background:linear-gradient(90deg,#fff,#fdf6e6)}
+.why h3{font-size:18px}.why p{color:var(--muted);font-size:13px}
+.stats{display:flex;gap:36px}.stats b{display:block;font-size:20px;color:var(--green)}.stats small{color:var(--muted);font-size:12px}
+
+/* signup */
+.auth{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:radial-gradient(circle at 20% 20%,#d9f1ea 0,transparent 50%),var(--bg)}
+.auth .left{padding:40px 6vw;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.auth h2{font-size:clamp(30px,4vw,44px);line-height:1.1;font-weight:800;color:var(--green)}
+.auth .right{display:grid;place-items:center;padding:30px}
+.form{width:100%;max-width:420px;padding:28px}
+.steps{display:flex;justify-content:space-between;margin-bottom:22px;font-size:11px;color:var(--muted);text-align:center}
+.steps div{flex:1;position:relative}
+.steps i{display:grid;place-items:center;width:26px;height:26px;margin:0 auto 4px;border-radius:50%;background:var(--line);font-style:normal;font-weight:700;font-size:12px}
+.steps .on i{background:var(--green);color:#fff}
+.steps div:not(:last-child)::after{content:"";position:absolute;top:13px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--line)}
+.form h3{font-size:20px;margin-bottom:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:14px;background:#fbfdfc}
+.field input:focus{outline:2px solid var(--teal);border-color:transparent}
+.form .btn{width:100%;justify-content:center;margin-top:6px}
+.form small{display:block;text-align:center;color:var(--muted);font-size:11px;margin-top:12px}
+
+/* dashboard */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px}
+.side .logo{padding:0 8px 18px}
+.side a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:600;color:var(--muted)}
+.side a.on{background:var(--mint);color:var(--green)}
+.upgrade{margin-top:auto;padding:14px;border-radius:12px;background:#fdf6e6;font-size:12px}
+.main{padding:22px 28px 90px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+.top h1{font-size:24px}.top p{color:var(--muted);font-size:13px}
+.top .right{display:flex;align-items:center;gap:14px}
+.search{padding:10px 16px;border:1px solid var(--line);border-radius:99px;background:#fff;width:240px;font:inherit;font-size:13px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#e9507a;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kpi{padding:14px;display:flex;gap:10px;align-items:center}
+.kpi small{color:var(--muted);font-size:11px;display:block}.kpi b{font-size:14px}
+.ring{--p:62;width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--teal) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;flex:none}
+.ring::before{content:attr(data-l);width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:11px;font-weight:800}
+.ring.lg{width:96px;height:96px}.ring.lg::before{width:74px;height:74px;font-size:18px}
+.road{padding:20px;margin-bottom:16px}
+.road header,.sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.road h3,.sec-h h3{font-size:16px}.sec-h a{font-size:12px;color:var(--green);font-weight:700}
+.track{display:flex;justify-content:space-between;position:relative;overflow-x:auto;padding:6px 0 4px;gap:12px}
+.track::before{content:"";position:absolute;left:40px;right:40px;top:34px;border-top:2px dashed #b9d9cf}
+.node{position:relative;text-align:center;font-size:12px;min-width:84px}
+.node i{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;margin:0 auto 6px;font-style:normal;font-size:20px;border:3px solid #fff;box-shadow:var(--shadow)}
+.node b{display:block;font-size:12px}.node small{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px}
+.next{padding:18px;display:flex;gap:14px;align-items:center;background:linear-gradient(90deg,#fff,var(--mint))}
+.next h4{font-size:15px}.next p{font-size:12px;color:var(--muted);margin:4px 0 10px}
+.over{padding:18px}.over .row{display:flex;gap:16px;align-items:center}
+.bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:6px 0 10px}.bar i{display:block;height:100%;background:var(--teal);border-radius:9px}
+.over li,.mile li{list-style:none;font-size:12px;display:flex;justify-content:space-between;color:var(--muted);margin-bottom:4px}
+.mile{padding:18px;font-size:13px}.mile .item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;background:var(--bg);margin:10px 0}
+
+/* detail row */
+.row2{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.panel{padding:16px;font-size:12px}.panel h4{font-size:14px;margin-bottom:10px}
+.task{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.task input{accent-color:var(--green)}
+.task span:last-child{margin-left:auto;color:var(--muted)}
+.gap{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.bubble{background:var(--mint);padding:10px;border-radius:12px;margin:6px 0}
+.bubble.me{background:#f1f1f6;margin-left:30px}
+
+@media(max-width:960px){
+  .hero,.auth{grid-template-columns:1fr}
+  .features,.row2{grid-template-columns:1fr 1fr}
+  .kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
+  .app{grid-template-columns:1fr}.side{display:none}
+  .nav nav{display:none}.search{display:none}.main{padding:18px 16px 90px}
+}
+@media(max-width:560px){.features,.row2,.kpis{grid-template-columns:1fr}.stats{gap:20px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ========== LANDING ========== -->
+<section class="view active" id="landing">
+  <div class="nav">
+    <div class="logo"><i>✈</i>CareerPilot AI</div>
+    <nav><a href="#">Home</a><a href="#">Features</a><a href="#">About</a><a href="#">Contact</a></nav>
+    <button class="btn primary" data-go="signup">Get Started</button>
+  </div>
+  <div class="hero">
+    <div>
+      <h1>Your Dream Job.<br><em>Reverse Engineered.</em></h1>
+      <p>Tell us where you want to go. Our AI works backwards to create a personalized career path based on your current skills, goals, time and timeline.</p>
+      <div class="cta">
+        <button class="btn primary" data-go="signup">Build My Career Roadmap →</button>
+        <button class="btn ghost" data-go="dash">See How It Works</button>
+      </div>
+    </div>
+    <div class="art">
+      <span class="tag" style="top:30px;left:30px">Your Future Awaits 🚀</span>
+      <span class="tag" style="bottom:36px;right:30px;color:var(--green)">Achieve ★</span>
+      <div class="person">🧑‍💻</div>
+    </div>
+  </div>
+  <div class="features">
+    <div class="card feat"><div class="ico">🎯</div><div><b>Personalized Plan</b><small>Based on your goals &amp; current skills</small></div></div>
+    <div class="card feat"><div class="ico" style="background:#ece6fd">🧩</div><div><b>Skill Gap Analysis</b><small>Know what to learn next</small></div></div>
+    <div class="card feat"><div class="ico" style="background:#fdf0dc">🗺️</div><div><b>Interactive Roadmap</b><small>Visual &amp; easy to follow</small></div></div>
+    <div class="card feat"><div class="ico" style="background:#e3edff">📈</div><div><b>Progress Tracking</b><small>Stay on track with real-time updates</small></div></div>
+  </div>
+  <div class="card why">
+    <div><h3>Why CareerPilot AI?</h3><p>Because your career isn't a one-size-fits-all journey.</p></div>
+    <div class="stats">
+      <div><b>100%</b><small>Personalized</small></div>
+      <div><b>Save Time</b><small>Get a clear plan</small></div>
+      <div><b>Build Confidence</b><small>Take control of your future</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SIGN UP ========== -->
+<section class="view" id="signup">
+  <div class="auth">
+    <div class="left">
+      <div class="logo"><i>✈</i>CareerPilot AI</div>
+      <h2>Let's Build<br>Your Career Plan</h2>
+      <p style="color:var(--muted);max-width:40ch">Tell us a little about yourself so we can create your personalized roadmap.</p>
+      <div style="font-size:120px">👩‍💻</div>
+    </div>
+    <div class="right">
+      <form class="card form" onsubmit="event.preventDefault();show('dash')">
+        <div class="steps">
+          <div class="on"><i>1</i>Basic Info</div><div><i>2</i>Career Goal</div><div><i>3</i>Skills</div><div><i>4</i>Review</div>
+        </div>
+        <h3>Create Your Account</h3>
+        <div class="field"><label for="n">Full Name</label><input id="n" placeholder="Enter your full name" required></div>
+        <div class="field"><label for="e">Email Address</label><input id="e" type="email" placeholder="you@example.com" required></div>
+        <div class="field"><label for="p">Phone Number</label><input id="p" type="tel" placeholder="+91 Enter phone number"></div>
+        <button class="btn primary" type="submit">Continue →</button>
+        <small>By continuing, you agree to our Terms &amp; Privacy Policy.</small>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DASHBOARD ========== -->
+<section class="view" id="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="logo"><i>✈</i>CareerPilot AI</div>
+      <a class="on" href="#">🏠 Home</a><a href="#">🗺️ Roadmap</a><a href="#">📊 Skill Gap</a>
+      <a href="#">💼 Projects</a><a href="#">🎓 Certifications</a><a href="#">⏱️ Timeline</a>
+      <a href="#">🎤 Interview</a><a href="#">🤖 AI Mock</a>
+      <div class="upgrade"><b>👑 Upgrade Plan</b><br>Get advanced features and personalized support</div>
+    </aside>
+
+    <div class="main">
+      <div class="top">
+        <div><h1>Hello, Guys
+             👋</h1><p>Your journey to a brighter future starts here. Keep going!</p></div>
+        <div class="right"><input class="search" placeholder="Search anything..." aria-label="Search"><span>🔔</span><div class="avatar">S</div></div>
+      </div>
+
+      <div class="kpis">
+        <div class="card kpi"><div class="ico">🎯</div><div><small>Dream Role</small><b>Full Stack Developer</b></div></div>
+        <div class="card kpi"><div class="ico">🌿</div><div><small>Target Industry</small><b>Climate-Tech</b></div></div>
+        <div class="card kpi"><div class="ico" style="background:#e3edff">🏢</div><div><small>Target Company</small><b>Startup</b></div></div>
+        <div class="card kpi"><div class="ring" data-l="62%"></div><div><small>Readiness</small><b>62%</b></div></div>
+        <div class="card kpi"><div class="ico" style="background:#fdf0dc">📅</div><div><small>Timeline</small><b>6 months</b></div></div>
+      </div>
+
+      <div class="card road">
+        <header><h3>Your Career Roadmap</h3><a class="sec-h" href="#" style="font-size:12px;color:var(--green);font-weight:700">View Full Roadmap →</a></header>
+        <div class="track">
+          <div class="node"><i style="background:#dff3ec">🎯</i><b>Dream Job</b><small>Full Stack Developer</small></div>
+          <div class="node"><i style="background:#e3f6ea">🛡️</i><b>Skills</b><small>4/10</small></div>
+          <div class="node"><i style="background:#ece6fd">💡</i><b>Projects</b><small>2/5</small></div>
+          <div class="node"><i style="background:#fdf0dc">💼</i><b>Experience</b><small>0/2</small></div>
+          <div class="node"><i style="background:#e3edff">🏅</i><b>Certifications</b><small>0/2</small></div>
+          <div class="node"><i style="background:#ffe5e5">🎤</i><b>Interview</b><small>0/4</small></div>
+          <div class="node"><i style="background:#dff3ec">🚩</i><b>Career Ready</b><small>🎉</small></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card next">
+          <div style="font-size:54px">🤖</div>
+          <div>
+            <span class="chip">AI Next Best Action</span>
+            <h4 style="margin-top:8px">Master React &amp; build a full-stack project.</h4>
+            <p>This will help you strengthen your frontend skills and improve your project portfolio.</p>
+            <button class="btn primary" style="padding:8px 16px">View Details</button>
+          </div>
+        </div>
+        <div class="card over">
+          <div class="sec-h"><h3>Quick Overview</h3></div>
+          <div class="row">
+            <div class="ring lg" data-l="62%"></div>
+            <ul style="flex:1"><li>Profile Complete <b>6/10</b></li><li>Skills <b>6/10</b></li><li>Projects <b>2/5</b></li><li>Experience <b>0/2</b></li></ul>
+          </div>
+        </div>
+        <div class="card mile">
+          <b>Upcoming Milestone</b>
+          <div class="item"><span>📌</span><div><b>Build a full-stack project</b><br><small style="color:var(--muted)">Week 3</small></div></div>
+          <button class="btn ghost" style="padding:8px 16px;width:100%;justify-content:center">View Tasks</button>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="card panel">
+          <h4>Skill Gap Analysis</h4>
+          <div style="display:flex;gap:14px;align-items:center;margin-bottom:10px">
+            <div class="ring lg" data-l="62%" style="background:conic-gradient(var(--teal) 0 30%,var(--amber) 30% 55%,var(--red) 55% 62%,var(--line) 62%)"></div>
+            <div><small>● Already Known 3<br>● Strong 3<br>● Needs Improvement 2<br>● Missing 2</small></div>
+          </div>
+          <div class="gap"><span>React</span><span class="chip bad">High Priority</span></div>
+          <div class="gap"><span>Node.js</span><span class="chip bad">High Priority</span></div>
+          <div class="gap"><span>System Design</span><span class="chip warn">Medium</span></div>
+          <div class="gap"><span>DSA</span><span class="chip warn">Medium</span></div>
+        </div>
+
+        <div class="card panel">
+          <h4>Tasks</h4>
+          <label class="task"><input type="checkbox" checked> Learn React fundamentals <span>2h</span></label>
+          <label class="task"><input type="checkbox" checked> Build a simple project <span>3h</span></label>
+          <label class="task"><input type="checkbox"> Read about REST APIs <span>2h</span></label>
+          <label class="task"><input type="checkbox"> Watch system design video <span>1h</span></label>
+          <h4 style="margin-top:14px">This Week's Goals</h4>
+          <label class="task"><input type="checkbox"> Complete frontend project</label>
+          <label class="task"><input type="checkbox"> Update your GitHub portfolio</label>
+        </div>
+
+        <div class="card panel">
+          <h4>Progress</h4>
+          <b>Overall Progress 62%</b>
+          <div class="bar"><i style="width:62%"></i></div>
+          <div class="gap"><span>Skills</span><b>4/10</b></div>
+          <div class="gap"><span>Projects</span><b>2/5</b></div>
+          <div class="gap"><span>Hours</span><b>68/120</b></div>
+          <div class="gap"><span>Milestones</span><b>1/4</b></div>
+        </div>
+
+        <div class="card panel">
+          <h4>AI Assistant</h4>
+          <div class="bubble me">What should I focus on this week?</div>
+          <div class="bubble">This week, focus on:<br>1. Complete your React project<br>2. Learn Node.js basics<br>You're on the right track! 🚀</div>
+          <input class="search" style="width:100%;margin-top:8px" placeholder="Ask Career AI..." aria-label="Ask Career AI">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="switch" role="tablist">
+  <button class="on" data-go="landing">Landing</button>
+  <button data-go="signup">Sign up</button>
+  <button data-go="dash">Dashboard</button>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+  document.querySelectorAll('.switch button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>show(el.dataset.go)));
+</script>
+<script>
+const API_URL = "http://127.0.0.1:8000";
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
+function showView(viewId) {
+    document.querySelectorAll(".view").forEach(view => {
+        view.classList.remove("active");
+    });
+
+    const view = document.getElementById(viewId);
+
+    if (view) {
+        view.classList.add("active");
+    }
+}
+
+document.querySelectorAll("[data-go]").forEach(button => {
+    button.addEventListener("click", () => {
+        showView(button.dataset.go);
+    });
+});
+
+
+/* =========================
+   SIGNUP / CAREER DATA
+========================= */
+
+let careerData = {
+    name: "",
+    email: "",
+    phone: "",
+    dream_job: "Full Stack Developer",
+    target_company: "Startup",
+    current_skills: "HTML, CSS, JavaScript",
+    hours_per_week: "10",
+    target_timeline: "6 months"
+};
+
+
+/* =========================
+   SIGNUP FORM
+========================= */
+
+const authForm = document.getElementById("authForm");
+
+if (authForm) {
+    authForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        careerData.name = document.getElementById("n").value;
+        careerData.email = document.getElementById("e").value;
+        careerData.phone = document.getElementById("p").value;
+
+        // Move to dashboard
+        showView("dash");
+
+        // Generate roadmap
+        await generateRoadmap();
+    });
+}
+
+
+/* =========================
+   GENERATE ROADMAP
+========================= */
+
+async function generateRoadmap() {
+
+    try {
+
+        console.log("Sending data to backend...");
+
+        const response = await fetch(`${API_URL}/generate-roadmap`, {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                dream_job: careerData.dream_job,
+                target_company: careerData.target_company,
+                current_skills: careerData.current_skills,
+                hours_per_week: careerData.hours_per_week,
+                target_timeline: careerData.target_timeline
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Backend error: ${response.status}`);
+        }
+
+        const roadmap = await response.json();
+
+        console.log("Roadmap received:", roadmap);
+
+        // Save roadmap
+        localStorage.setItem(
+            "careerRoadmap",
+            JSON.stringify(roadmap)
+        );
+
+        // Update UI
+        renderRoadmap(roadmap);
+
+        alert("🎉 Your AI Career Roadmap has been generated!");
+
+    } catch (error) {
+
+        console.error("Roadmap generation failed:", error);
+
+        alert(
+            "❌ Backend connection failed.\n\n" +
+            "Make sure FastAPI backend is running."
+        );
+    }
+}
+
+
+/* =========================
+   RENDER ROADMAP
+========================= */
+
+function renderRoadmap(roadmap) {
+
+    if (!roadmap || !roadmap.nodes) {
+        console.error("Invalid roadmap:", roadmap);
+        return;
+    }
+
+    const track = document.querySelector(".track");
+
+    if (!track) return;
+
+    track.innerHTML = "";
+
+    roadmap.nodes.forEach((node, index) => {
+
+        const div = document.createElement("div");
+
+        div.className = "node";
+
+        div.innerHTML = `
+            <i style="background:#dff3ec">
+                ${index === 0 ? "🎯" : "📚"}
+            </i>
+
+            <b>${escapeHTML(node.data?.label || "Step")}</b>
+
+            <small>
+                ${escapeHTML(node.data?.description || "")}
+            </small>
+        `;
+
+        track.appendChild(div);
+    });
+}
+
+
+/* =========================
+   UPDATE ROADMAP
+========================= */
+
+async function updateRoadmap(knownSkillId) {
+
+    const saved = localStorage.getItem("careerRoadmap");
+
+    if (!saved) {
+        alert("Generate a roadmap first.");
+        return;
+    }
+
+    try {
+
+        const roadmap = JSON.parse(saved);
+
+        const response = await fetch(`${API_URL}/update-roadmap`, {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                roadmap_context: roadmap,
+                known_skill_id: knownSkillId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Backend error: ${response.status}`);
+        }
+
+        const updatedRoadmap = await response.json();
+
+        localStorage.setItem(
+            "careerRoadmap",
+            JSON.stringify(updatedRoadmap)
+        );
+
+        renderRoadmap(updatedRoadmap);
+
+        alert("✅ Roadmap updated!");
+
+    } catch (error) {
+
+        console.error("Update failed:", error);
+
+        alert("❌ Could not update roadmap.");
+    }
+}
+
+
+/* =========================
+   LOAD SAVED ROADMAP
+========================= */
+
+function loadSavedRoadmap() {
+
+    const saved = localStorage.getItem("careerRoadmap");
+
+    if (!saved) return;
+
+    try {
+
+        const roadmap = JSON.parse(saved);
+
+        renderRoadmap(roadmap);
+
+    } catch (error) {
+
+        console.error("Saved roadmap is invalid:", error);
+
+    }
+}
+
+
+/* =========================
+   SECURITY
+========================= */
+
+function escapeHTML(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
+}
+
+
+/* =========================
+   INITIALIZE
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    loadSavedRoadmap();
+
+    console.log("CareerPilot AI frontend loaded.");
+
+});
+</script>
+</body>
+</html>
